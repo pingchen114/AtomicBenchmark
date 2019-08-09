@@ -43,9 +43,17 @@ final class ReadWriteLock {
 		return rwlock
 	}()
 
-	func lock() {
+    deinit {
+        pthread_rwlock_destroy(&rwlock)
+    }
+
+	func writerLock() {
 		pthread_rwlock_wrlock(&rwlock)
 	}
+
+    func readerLock() {
+        pthread_rwlock_rdlock(&rwlock)
+    }
 
 	func unlock() {
 		pthread_rwlock_unlock(&rwlock)

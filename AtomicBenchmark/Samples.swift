@@ -13,7 +13,7 @@ protocol Sample {
 	var title: String { get }
 }
 
-class LockSample {
+class LockSample: Sample {
 	private let lock: () -> Void
 	private let unlock: () -> Void
 	let title: String
@@ -41,10 +41,38 @@ class LockSample {
 	}
 }
 
-extension LockSample: Sample {}
+class RWLockSample: Sample {
+    private let setterlock: () -> Void
+    private let getterlock: (() -> Void)!
+    private let unlock: () -> Void
+    let title: String
+
+    init(title: String, setterLock: @escaping () -> Void, getterLock: @escaping () -> Void, unlock: @escaping () -> Void) {
+        self.setterlock = setterLock
+        self.getterlock = getterLock
+        self.unlock = unlock
+        self.title = title
+    }
+
+    private var underlyingFoo = 0
+
+    var foo: Int {
+        get {
+            getterlock()
+            let value = underlyingFoo
+            unlock()
+            return value
+        }
+        set {
+            setterlock()
+            underlyingFoo = newValue
+            unlock()
+        }
+    }
+}
 
 class DispatchQueueSample {
-	private let queue = DispatchQueue(label: "com.vadimbulavin.DispatchQueueSample")
+	private let queue = DispatchQueue(label: "com.vadimbulavin.DispatchQueueSample", qos: .userInteractive, attributes: .concurrent)
 	private var underlyingFoo = 0
 
 	var foo: Int {
@@ -52,7 +80,7 @@ class DispatchQueueSample {
 			return queue.sync { underlyingFoo }
 		}
 		set {
-			queue.sync {
+            queue.sync(flags: .barrier) {
 				self.underlyingFoo = newValue
 			}
 		}

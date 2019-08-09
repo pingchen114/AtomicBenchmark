@@ -18,23 +18,28 @@ let spinLock = SpinLock()
 let spinLockSample = LockSample(title: "Spin Lock", lock: spinLock.lock, unlock: spinLock.unlock)
 
 let rwLock = ReadWriteLock()
-let rwLockSample = LockSample(title: "Read Write Lock", lock: rwLock.lock, unlock: rwLock.unlock)
+let rwLockSample = RWLockSample(title: "Read Write Lock", setterLock: rwLock.writerLock, getterLock: rwLock.readerLock, unlock: rwLock.unlock)
 
 let dispatchQueueSample = DispatchQueueSample()
 
 let operationsQueueSample = OperationsQueueSample()
 
 let samples: [Sample] = [
-	nsLockSample,
-	mutexSample,
-	spinLockSample,
+    nsLockSample,
+    mutexSample,
+    spinLockSample,
 	rwLockSample,
 	dispatchQueueSample,
-	operationsQueueSample
+//    operationsQueueSample
 ]
 
-let iterations = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16_384, 32_768, 65_536, 131_072, 262_144, 524_288, 1_048_576]
-let executer = GetterSetterBenchmark(settings: .init(attemptsPerIteration: 100, iterationsPerSample: iterations))
+let iterations =  [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16_384, 32_768, 65_536, 131_072, 262_144, 524_288]
+let executer = GetterSetterBenchmark(settings: .init(numGetterThreads: 4,
+                                                     numSetterThreads: 1,
+                                                     attemptsPerIteration: 100,
+                                                     iterationsPerSample: iterations,
+                                                     getter_divide_setter: 32))
+
 let results = samples.map(executer.measure)
 let report = Report(results: results)
 ReportRenderer(report: report).render()

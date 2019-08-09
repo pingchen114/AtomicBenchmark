@@ -15,7 +15,7 @@ struct ReportRenderer {
 		for result in report.results {
 			print("***** \(result.title) *****")
 			for measurement in result.measurements {
-				print("\(measurement.operation): \(measurement.iterations) iterations completed in \(measurement.duration)s")
+				print("\(measurement.operation): \(measurement.iterations) iterations completed in \(String(format: "%.5f", measurement.duration))s")
 			}
 			print("\n")
 		}

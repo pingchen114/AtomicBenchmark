@@ -12,6 +12,17 @@ struct Measurement {
 	let iterations: Int
 	let duration: TimeInterval
 	let operation: String
+
+    static func +=(_ lhs: inout Measurement,_ rhs: Measurement) {
+        guard lhs.iterations == rhs.iterations, lhs.operation == rhs.operation else {
+            fatalError("Incorrect usage")
+        }
+        lhs = Measurement(iterations: lhs.iterations, duration: lhs.duration + rhs.duration, operation: lhs.operation)
+    }
+
+    static func /(_ lhs: Measurement, _ rhs: TimeInterval) -> Measurement {
+        return Measurement(iterations: lhs.iterations, duration: lhs.duration / rhs, operation: lhs.operation)
+    }
 }
 
 struct Result {
